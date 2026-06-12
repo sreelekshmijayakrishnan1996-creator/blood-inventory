@@ -4,20 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\TemperatureLog;
-use App\Models\Alert;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Events\CriticalTemperatureDetected;
+use App\Http\Requests\TemperatureLogRequest;
 
 class TemperatureLogController extends Controller
 {
-    public function store(Request $request)
+    public function store(TemperatureLogRequest $request)
     {
-        $request->validate([
-            'refrigerator_id' => 'required|exists:refrigerators,id',
-            'temperature' => 'required|numeric',
-            'logged_at' => 'nullable|date',
-        ]);
-
         $temperature = $request->temperature;
 
         if ($temperature >= 2 && $temperature <= 6) {
@@ -35,13 +30,7 @@ class TemperatureLogController extends Controller
         ]);
 
         if ($status === 'Critical') {
-            Alert::create([
-                'refrigerator_id' => $request->refrigerator_id,
-                'type' => 'critical_temperature',
-                'message' => 'Critical temperature detected above 8°C',
-                'temperature' => $temperature,
-                'alerted_at' => now(),
-            ]);
+            event(new CriticalTemperatureDetected($log));
         }
 
         return response()->json([

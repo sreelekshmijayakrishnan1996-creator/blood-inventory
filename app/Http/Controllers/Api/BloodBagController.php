@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BloodBag;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Http\Requests\BloodBagRequest;
 
 class BloodBagController extends Controller
 {
@@ -18,18 +20,8 @@ class BloodBagController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(BloodBagRequest $request)
     {
-        $request->validate([
-            'refrigerator_id' => 'required|exists:refrigerators,id',
-            'bag_number' => 'required|unique:blood_bags,bag_number',
-            'blood_group' => 'required',
-            'donor_name' => 'required',
-            'collection_date' => 'required|date',
-            'expiry_date' => 'required|date|after:collection_date',
-            'quantity_ml' => 'required|integer|min:1',
-            'status' => 'required|in:Available,Reserved,Dispatched,Expired',
-        ]);
 
         $bloodBag = BloodBag::create($request->all());
 
@@ -50,20 +42,9 @@ class BloodBagController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id)
+    public function update(BloodBagRequest $request, string $id)
     {
         $bloodBag = BloodBag::findOrFail($id);
-
-        $request->validate([
-            'refrigerator_id' => 'required|exists:refrigerators,id',
-            'bag_number' => 'required|unique:blood_bags,bag_number,' . $id,
-            'blood_group' => 'required',
-            'donor_name' => 'required',
-            'collection_date' => 'required|date',
-            'expiry_date' => 'required|date|after:collection_date',
-            'quantity_ml' => 'required|integer|min:1',
-            'status' => 'required|in:Available,Reserved,Dispatched,Expired',
-        ]);
 
         $bloodBag->update($request->all());
 
@@ -84,4 +65,50 @@ class BloodBagController extends Controller
             'message' => 'Blood bag deleted successfully'
         ]);
     }
+
+    public function expiringSoon()
+{
+    $bags = BloodBag::whereBetween('expiry_date', [
+        Carbon::today(),
+        Carbon::today()->addDay()
+    ])->get();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Blood bags expiring within 24 hours',
+        'data' => $bags
+    ]);
+}
+
+public function expired()
+{
+    $bags = BloodBag::whereDate('expiry_date', '<', Carbon::today())
+        ->orWhere('status', 'Expired')
+        ->get();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Expired blood bags',
+        'data' => $bags
+    ]);
+}
+
+public function nearRiskPercentage()
+{
+    $totalBags = BloodBag::count();
+
+    $nearRiskBags = BloodBag::whereBetween('expiry_date', [
+        Carbon::today(),
+        Carbon::today()->addDay()
+    ])->count();
+
+    $percentage = $totalBags > 0
+        ? round(($nearRiskBags / $totalBags) * 100, 2)
+        : 0;
+
+    return response()->json([
+        'status' => true,
+        'near_risk_inventory_percentage' => $percentage
+    ]);
+}
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Refrigerator;
 use Illuminate\Http\Request;
+use App\Http\Requests\RefrigeratorRequest;
 
 class RefrigeratorController extends Controller
 {
@@ -21,15 +22,8 @@ class RefrigeratorController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(RefrigeratorRequest $request)
     {
-        $request->validate([
-            'blood_bank_id' => 'required|exists:blood_banks,id',
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|unique:refrigerators,code',
-            'status' => 'required|in:active,inactive',
-        ]);
-
         $refrigerator = Refrigerator::create($request->all());
 
         return response()->json([
@@ -54,16 +48,9 @@ class RefrigeratorController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id)
+    public function update(RefrigeratorRequest $request, string $id)
     {
         $refrigerator = Refrigerator::findOrFail($id);
-
-        $request->validate([
-            'blood_bank_id' => 'required|exists:blood_banks,id',
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|unique:refrigerators,code,' . $id,
-            'status' => 'required|in:active,inactive',
-        ]);
 
         $refrigerator->update($request->all());
 

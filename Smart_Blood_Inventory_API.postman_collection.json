@@ -1,0 +1,226 @@
+{
+  "info": {
+    "name": "Smart Blood Inventory API",
+    "_postman_id": "blood-inventory-api",
+    "description": "Laravel 11 Smart Blood Inventory & Temperature Monitoring System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": {
+              "type": "bearer"
+            },
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Refrigerators",
+      "item": [
+        {
+          "name": "Get Refrigerators",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/refrigerators"
+          }
+        },
+        {
+          "name": "Create Refrigerator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blood_bank_id\": 1,\n  \"name\": \"Main Refrigerator\",\n  \"code\": \"REF-001\",\n  \"status\": \"active\"\n}"
+            },
+            "url": "{{base_url}}/api/refrigerators"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Blood Bags",
+      "item": [
+        {
+          "name": "Get Blood Bags",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/blood-bags"
+          }
+        },
+        {
+          "name": "Create Blood Bag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refrigerator_id\": 1,\n  \"bag_number\": \"BAG-001\",\n  \"blood_group\": \"A+\",\n  \"donor_name\": \"Rahul\",\n  \"collection_date\": \"2026-06-12\",\n  \"expiry_date\": \"2026-07-12\",\n  \"quantity_ml\": 450,\n  \"status\": \"Available\"\n}"
+            },
+            "url": "{{base_url}}/api/blood-bags"
+          }
+        },
+        {
+          "name": "Get Blood Bag By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/blood-bags/1"
+          }
+        },
+        {
+          "name": "Update Blood Bag",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refrigerator_id\": 1,\n  \"bag_number\": \"BAG-001\",\n  \"blood_group\": \"A+\",\n  \"donor_name\": \"Rahul Updated\",\n  \"collection_date\": \"2026-06-12\",\n  \"expiry_date\": \"2026-07-12\",\n  \"quantity_ml\": 500,\n  \"status\": \"Available\"\n}"
+            },
+            "url": "{{base_url}}/api/blood-bags/1"
+          }
+        },
+        {
+          "name": "Delete Blood Bag",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/blood-bags/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Temperature Monitoring",
+      "item": [
+        {
+          "name": "Create Temperature Log",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refrigerator_id\": 1,\n  \"temperature\": 10.5\n}"
+            },
+            "url": "{{base_url}}/api/temperature-logs"
+          }
+        },
+        {
+          "name": "Temperature Analysis",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/temperature-analysis/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Dashboard Analytics",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/dashboard"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Blood Expiry",
+      "item": [
+        {
+          "name": "Blood Bags Expiring Soon",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/blood-bags-expiring"
+          }
+        },
+        {
+          "name": "Expired Blood Bags",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/expired-blood-bags"
+          }
+        },
+        {
+          "name": "Near Risk Percentage",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/near-risk-percentage"
+          }
+        }
+      ]
+    }
+  ]
+}

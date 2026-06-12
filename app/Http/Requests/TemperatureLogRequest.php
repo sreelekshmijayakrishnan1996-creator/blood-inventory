@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BloodBagRequest extends FormRequest
+class TemperatureLogRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,13 +23,8 @@ class BloodBagRequest extends FormRequest
     {
         return [
             'refrigerator_id' => 'required|exists:refrigerators,id',
-            'bag_number' => 'required|unique:blood_bags,bag_number',
-            'blood_group' => 'required',
-            'donor_name' => 'required',
-            'collection_date' => 'required|date',
-            'expiry_date' => 'required|date|after:collection_date',
-            'quantity_ml' => 'required|integer|min:1',
-            'status' => 'required|in:Available,Reserved,Dispatched,Expired',
+            'temperature' => 'required|numeric|min:-20|max:10',
+            'logged_at' => 'required|date',
         ];
     }
 }
